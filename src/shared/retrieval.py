@@ -13,28 +13,51 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.vectorstores import VectorStoreRetriever
 
 from shared.configuration import BaseConfiguration
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
 
 ## Encoder constructors
 
 
-def make_text_encoder(model: str) -> Embeddings:
+# def make_text_encoder(model: str) -> Embeddings:
+#     """Connect to the configured text encoder."""
+#     provider, model = model.split("/", maxsplit=1)
+#     match provider:
+#         case "openai":
+#             from langchain_openai import OpenAIEmbeddings
+
+#             return OpenAIEmbeddings(model=model)
+#         case "cohere":
+#             from langchain_cohere import CohereEmbeddings
+
+#             return CohereEmbeddings(model=model)  # type: ignore
+#         case _:
+#             raise ValueError(f"Unsupported embedding provider: {provider}")
+
+def make_text_encoder() -> Embeddings:
     """Connect to the configured text encoder."""
-    provider, model = model.split("/", maxsplit=1)
-    match provider:
-        case "openai":
-            from langchain_openai import OpenAIEmbeddings
 
-            return OpenAIEmbeddings(model=model)
-        case "cohere":
-            from langchain_cohere import CohereEmbeddings
+    from langchain_openai import AzureOpenAIEmbeddings
+    model = "text-embedding-ada-002" 
+    openai_api_version = os.environ["OPENAI_API_VERSION"]
+    
+    embedding_function = AzureOpenAIEmbeddings(
+        openai_api_key = os.environ["AZURE_OPENAI_API_KEY"],
+        azure_endpoint = os.environ["AZURE_EMBEDDINGS_ENDPOINT"],
+        model = model,
+        chunk_size = 16,
+        max_retries = 3,
+        retry_interval = 10,
+        max_tokens = 8191,
+        show_progress_bar = True,
+    )
+    return embedding_function
 
-            return CohereEmbeddings(model=model)  # type: ignore
-        case _:
-            raise ValueError(f"Unsupported embedding provider: {provider}")
 
 
 ## Retriever constructors
-
 
 @contextmanager
 def make_elastic_retriever(
@@ -90,6 +113,36 @@ def make_mongodb_retriever(
     )
     yield vstore.as_retriever(search_kwargs=configuration.search_kwargs)
 
+@contextmanager
+def make_faiss_retriever(
+    configuration: BaseConfiguration, embedding_model: Embeddings
+) -> Generator[VectorStoreRetriever, None, None]:
+    """Configure this agent to connect to load local faiss store."""
+
+    from langchain_community.vecctorstores import FAISS
+    import faiss
+    from langchain_community.docstore import InMemoryDocstore
+
+    # index = faiss.IndexFlatIP(1536)
+    # vstore = FAISS(
+    #     index=index,
+    #     embedding_function=embedding_model,
+    #     index_path="../data/faiss_index",
+    #     docstore = InMemoryDocstore(), 
+    #     index_to_docstore_id = {}, 
+    #     distance_strategy = "DistanceStrategy.MAX_INNER_PRODUCT", 
+    # )
+
+    # vstore.add_documents(data)
+    # vstore.save_local("faiss_index")
+
+    vstore = FAISS.load_local(
+        os.path.join(os.path.dirname(__file__), "../data/faiss_index"),
+        embedding_model,
+        allow_dangerous_deserialization=True,
+    )
+
+    yield vstore.as_retriever(search_kwargs=configuration.search_kwargs)
 
 @contextmanager
 def make_retriever(
@@ -97,18 +150,23 @@ def make_retriever(
 ) -> Generator[VectorStoreRetriever, None, None]:
     """Create a retriever for the agent, based on the current configuration."""
     configuration = BaseConfiguration.from_runnable_config(config)
-    embedding_model = make_text_encoder(configuration.embedding_model)
+    embedding_model = make_text_encoder()
+
     match configuration.retriever_provider:
-        case "elastic" | "elastic-local":
-            with make_elastic_retriever(configuration, embedding_model) as retriever:
-                yield retriever
+        # case "elastic" | "elastic-local":
+        #     with make_elastic_retriever(configuration, embedding_model) as retriever:
+        #         yield retriever
 
-        case "pinecone":
-            with make_pinecone_retriever(configuration, embedding_model) as retriever:
-                yield retriever
+        # case "pinecone":
+        #     with make_pinecone_retriever(configuration, embedding_model) as retriever:
+        #         yield retriever
 
-        case "mongodb":
-            with make_mongodb_retriever(configuration, embedding_model) as retriever:
+        # case "mongodb":
+        #     with make_mongodb_retriever(configuration, embedding_model) as retriever:
+        #         yield retriever
+        
+        case "faiss":
+            with make_faiss_retriever(configuration, embedding_model) as retriever:
                 yield retriever
 
         case _:
@@ -117,3 +175,30 @@ def make_retriever(
                 f"Expected one of: {', '.join(BaseConfiguration.__annotations__['retriever_provider'].__args__)}\n"
                 f"Got: {configuration.retriever_provider}"
             )
+
+# @contextmanager
+# def make_retriever(
+#     config: RunnableConfig,
+# ) -> Generator[VectorStoreRetriever, None, None]:
+#     """Create a retriever for the agent, based on the current configuration."""
+#     configuration = BaseConfiguration.from_runnable_config(config)
+#     embedding_model = make_text_encoder(configuration.embedding_model)
+
+#     provider = configuration.retriever_provider
+
+#     if provider in ("elastic", "elastic-local"):
+#         with make_elastic_retriever(configuration, embedding_model) as retriever:
+#             yield retriever
+#     elif provider == "pinecone":
+#         with make_pinecone_retriever(configuration, embedding_model) as retriever:
+#             yield retriever
+#     elif provider == "mongodb":
+#         with make_mongodb_retriever(configuration, embedding_model) as retriever:
+#             yield retriever
+#     else:
+#         expected = ', '.join(BaseConfiguration.__annotations__['retriever_provider'].__args__)
+#         raise ValueError(
+#             "Unrecognized retriever_provider in configuration. "
+#             f"Expected one of: {expected}\n"
+#             f"Got: {provider}"
+#         ) 

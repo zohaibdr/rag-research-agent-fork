@@ -4,26 +4,32 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Annotated
-
+import os 
 from retrieval_graph import prompts
 from shared.configuration import BaseConfiguration
+from dotenv import load_dotenv, find_dotenv
 
+load_dotenv(find_dotenv())
 
-@dataclass(kw_only=True)
+OPENAI_API_VERSION = os.environ["OPENAI_API_VERSION"]
+
+@dataclass (kw_only=True)
 class AgentConfiguration(BaseConfiguration):
     """The configuration for the agent."""
 
     # models
 
     query_model: Annotated[str, {"__template_metadata__": {"kind": "llm"}}] = field(
-        default="anthropic/claude-3-haiku-20240307",
+        # default="anthropic/claude-3-haiku-20240307",
+        default = "azure-openai/gpt-4o-mini",
         metadata={
             "description": "The language model used for processing and refining queries. Should be in the form: provider/model-name."
         },
     )
 
     response_model: Annotated[str, {"__template_metadata__": {"kind": "llm"}}] = field(
-        default="anthropic/claude-3-5-sonnet-20240620",
+        # default="anthropic/claude-3-5-sonnet-20240620",
+        default = "azure-openai/gpt-4o-mini",
         metadata={
             "description": "The language model used for generating responses. Should be in the form: provider/model-name."
         },

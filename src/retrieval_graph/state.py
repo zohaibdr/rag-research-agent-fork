@@ -17,7 +17,7 @@ from shared.state import reduce_docs
 # Optional, the InputState is a restricted version of the State that is used to
 # define a narrower interface to the outside world vs. what is maintained
 # internally.
-@dataclass(kw_only=True)
+@dataclass#(kw_only=True)
 class InputState:
     """Represents the input state for the agent.
 
@@ -68,7 +68,7 @@ class Router(TypedDict):
 # This is the primary state of your agent, where you can store any information
 
 
-@dataclass(kw_only=True)
+@dataclass#(kw_only=True)
 class AgentState(InputState):
     """State of the retrieval graph / agent."""
 

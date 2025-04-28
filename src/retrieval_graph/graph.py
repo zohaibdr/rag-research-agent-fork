@@ -16,7 +16,10 @@ from retrieval_graph.configuration import AgentConfiguration
 from retrieval_graph.researcher_graph.graph import graph as researcher_graph
 from retrieval_graph.state import AgentState, InputState, Router
 from shared.utils import format_docs, load_chat_model
-
+# import os
+# from dotenv import load_dotenv, find_dotenv
+# load_dotenv(find_dotenv())
+# OPENAI_API_VERSION = os.environ["OPENAI_API_VERSION"]
 
 async def analyze_and_route_query(
     state: AgentState, *, config: RunnableConfig
@@ -35,6 +38,7 @@ async def analyze_and_route_query(
     """
     configuration = AgentConfiguration.from_runnable_config(config)
     model = load_chat_model(configuration.query_model)
+    print(model) 
     messages = [
         {"role": "system", "content": configuration.router_system_prompt}
     ] + state.messages
@@ -119,7 +123,7 @@ async def respond_to_general_query(
 
 async def create_research_plan(
     state: AgentState, *, config: RunnableConfig
-) -> dict[str, list[str] | str]:
+) -> dict[str, list[str]]:
     """Create a step-by-step research plan for answering a LangChain-related query.
 
     Args:

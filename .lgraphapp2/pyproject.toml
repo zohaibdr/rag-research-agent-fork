@@ -1,9 +1,9 @@
 [project]
-name = "rag-research-graph"
+name = "retrieval-graph"
 version = "0.0.1"
-description = "Starter template for making a custom RAG research agent graph in LangGraph."
+description = "Starter template for making a custom retrieval graph in LangGraph."
 authors = [
-    { name = "Vadym Barda", email = "19161700+vbarda@users.noreply.github.com" }
+    { name = "William Fu-Hinthorn", email = "13333726+hinthornw@users.noreply.github.com" },
 ]
 license = { text = "MIT" }
 readme = "README.md"
@@ -16,7 +16,7 @@ dependencies = [
     "langchain-fireworks>=0.1.7",
     "python-dotenv>=1.0.1",
     "langchain-elasticsearch>=0.2.2,<0.3.0",
-    
+
     "msgspec>=0.18.6",
     "langchain-mongodb>=0.1.9",
     "langchain-cohere>=0.2.4",
@@ -30,13 +30,10 @@ requires = ["setuptools>=73.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["retrieval_graph", "index_graph", "shared"]
+packages = ["langgraph.templates.retrieval_graph", "retrieval_graph"]
 [tool.setuptools.package-dir]
 "langgraph.templates.retrieval_graph" = "src/retrieval_graph"
-"langgraph.templates.index_graph" = "src/index_graph"
 "retrieval_graph" = "src/retrieval_graph"
-"index_graph" = "src/index_graph"
-"shared" = "src/shared"
 
 
 [tool.setuptools.package-data]
@@ -65,7 +62,3 @@ lint.ignore = [
 "tests/*" = ["D", "UP"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-[tool.pytest.ini_options]
-pythonpath = [
-  "src"
-]

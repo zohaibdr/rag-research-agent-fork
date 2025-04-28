@@ -11,14 +11,14 @@ from langchain_core.documents import Document
 from shared.state import reduce_docs
 
 
-@dataclass(kw_only=True)
+@dataclass#(kw_only=True)
 class QueryState:
     """Private state for the retrieve_documents node in the researcher graph."""
 
     query: str
 
 
-@dataclass(kw_only=True)
+@dataclass#(kw_only=True)
 class ResearcherState:
     """State of the researcher graph / agent."""
 
