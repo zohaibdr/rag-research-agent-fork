@@ -20,7 +20,6 @@ load_dotenv(find_dotenv())
 
 ## Encoder constructors
 
-
 # def make_text_encoder(model: str) -> Embeddings:
 #     """Connect to the configured text encoder."""
 #     provider, model = model.split("/", maxsplit=1)
@@ -49,12 +48,9 @@ def make_text_encoder() -> Embeddings:
         model = model,
         chunk_size = 16,
         max_retries = 3,
-        retry_interval = 10,
-        max_tokens = 8191,
         show_progress_bar = True,
     )
     return embedding_function
-
 
 
 ## Retriever constructors
@@ -119,26 +115,16 @@ def make_faiss_retriever(
 ) -> Generator[VectorStoreRetriever, None, None]:
     """Configure this agent to connect to load local faiss store."""
 
-    from langchain_community.vecctorstores import FAISS
-    import faiss
-    from langchain_community.docstore import InMemoryDocstore
+    from langchain_community.vectorstores import FAISS
 
-    # index = faiss.IndexFlatIP(1536)
-    # vstore = FAISS(
-    #     index=index,
-    #     embedding_function=embedding_model,
-    #     index_path="../data/faiss_index",
-    #     docstore = InMemoryDocstore(), 
-    #     index_to_docstore_id = {}, 
-    #     distance_strategy = "DistanceStrategy.MAX_INNER_PRODUCT", 
-    # )
+    # load an already created in memory faiss index
 
-    # vstore.add_documents(data)
-    # vstore.save_local("faiss_index")
+    # print ("cwd:::", os.getcwd() )
 
     vstore = FAISS.load_local(
-        os.path.join(os.path.dirname(__file__), "../data/faiss_index"),
-        embedding_model,
+        folder_path="./notebooks/faiss_index",
+        index_name= "index", 
+        embeddings = embedding_model,
         allow_dangerous_deserialization=True,
     )
 

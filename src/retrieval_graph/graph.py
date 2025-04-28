@@ -63,12 +63,17 @@ def route_query(
         ValueError: If an unknown router type is encountered.
     """
     _type = state.router["type"]
-    if _type == "langchain":
+    # if _type == "langchain":
+    #     return "create_research_plan"
+    # elif _type == "more-info":
+    #     return "ask_for_more_info"
+    # elif _type == "general":
+    #     return "respond_to_general_query"
+
+    # always route to create research plan for now
+    if _type == "langchain" or _type == "more-info" or _type == "general":
         return "create_research_plan"
-    elif _type == "more-info":
-        return "ask_for_more_info"
-    elif _type == "general":
-        return "respond_to_general_query"
+
     else:
         raise ValueError(f"Unknown router type {_type}")
 

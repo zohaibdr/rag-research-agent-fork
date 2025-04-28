@@ -79,6 +79,9 @@ def retrieve_in_parallel(state: ResearcherState) -> list[Send]:
         - Creates a Send object for each query in the state.
         - Each Send object targets the "retrieve_documents" node with the corresponding query.
     """
+    # Send – A message or packet to send to a specific node in the graph.
+    # sending multiple inputs returns result for each. 
+
     return [
         Send("retrieve_documents", QueryState(query=query)) for query in state.queries
     ]

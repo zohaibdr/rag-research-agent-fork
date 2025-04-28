@@ -10,10 +10,6 @@ from typing import Optional
 from langchain.chat_models import init_chat_model
 from langchain_core.documents import Document
 from langchain_core.language_models import BaseChatModel
-# import os
-# from dotenv import load_dotenv, find_dotenv
-# load_dotenv(find_dotenv())
-# OPENAI_API_VERSION = os.environ["OPENAI_API_VERSION"]
 
 def _format_doc(doc: Document) -> str:
     """Format a single document as XML.
