@@ -7,5 +7,5 @@ run pip install -e .
 # to run the agent
 Be in the `D:\SYNEREPOS\rag-research-agent-fork` folder and run the following command:
 ```bash
-python notebooks/invoke_retrieval_graph.py
+python src/invoke_graph.py
 ```

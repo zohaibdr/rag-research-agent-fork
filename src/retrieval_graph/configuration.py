@@ -35,6 +35,14 @@ class AgentConfiguration(BaseConfiguration):
         },
     )
 
+    thread_id: int = field(
+        default=1,
+        metadata={
+            "description": "The number of threads for memory"
+        },
+    )
+
+
     # prompts
 
     router_system_prompt: str = field(

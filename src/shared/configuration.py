@@ -8,7 +8,7 @@ from typing import Annotated, Any, Literal, Optional, Type, TypeVar
 from langchain_core.runnables import RunnableConfig, ensure_config
 
 
-@dataclass #(kw_only=True)
+@dataclass (kw_only=True)
 class BaseConfiguration:
     """Configuration class for indexing and retrieval operations.
 
@@ -28,17 +28,21 @@ class BaseConfiguration:
     )
 
     retriever_provider: Annotated[
-        Literal["elastic-local", "elastic", "pinecone", "mongodb", "faiss"],	
+        Literal["mongodb", "faiss"],	
         {"__template_metadata__": {"kind": "retriever"}},
     ] = field(
         default="faiss",
         metadata={
-            "description": "The vector store provider to use for retrieval. Options are 'elastic', 'pinecone', 'mongodb', 'faiss'."
+            "description": "The vector store provider to use for retrieval. Options are 'mongodb', 'faiss'."
         },
     )
 
     search_kwargs: dict[str, Any] = field(
-        default_factory=dict,
+        default_factory=lambda: {
+            "k": 3,
+            "fetch_k": 5,
+            "score_threshold": 0.2
+        },
         metadata={
             "description": "Additional keyword arguments to pass to the search function of the retriever."
         },
