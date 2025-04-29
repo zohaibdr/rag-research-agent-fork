@@ -1,6 +1,6 @@
 [project]
 name = "rag-research-agent"
-version = "0.0.1"
+version = "0.1.0"
 description = "A custom RAG research agent graph in LangGraph."
 authors = [
     { name = "Zohaib Aftab", email = "" }
