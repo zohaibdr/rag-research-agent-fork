@@ -8,6 +8,7 @@ import os
 from retrieval_graph import prompts
 from shared.configuration import BaseConfiguration
 from dotenv import load_dotenv, find_dotenv
+import uuid
 
 load_dotenv(find_dotenv())
 
@@ -35,8 +36,8 @@ class AgentConfiguration(BaseConfiguration):
         },
     )
 
-    thread_id: int = field(
-        default=1,
+    thread_id: str = field(
+        default=uuid.uuid4().hex[:8],  # Generate a random thread ID
         metadata={
             "description": "The number of threads for memory"
         },
@@ -44,7 +45,6 @@ class AgentConfiguration(BaseConfiguration):
 
 
     # prompts
-
     router_system_prompt: str = field(
         default=prompts.ROUTER_SYSTEM_PROMPT,
         metadata={

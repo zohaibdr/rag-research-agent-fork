@@ -1,5 +1,7 @@
 """
 Script to invoke the retrieval graph for answering questions.
+run in terminal using:
+- python src/invoke_graph.py
 """
 import asyncio
 from typing import Dict, Any
@@ -7,18 +9,13 @@ from langchain_core.messages import HumanMessage
 from dataclasses import asdict
 from retrieval_graph.configuration import AgentConfiguration
 from retrieval_graph.graph import graph
-# import os
-# from dotenv import load_dotenv, find_dotenv
-
-# load_dotenv(find_dotenv())
-# OPENAI_API_VERSION = os.environ["OPENAI_API_VERSION"]
 
 async def main(question: str) -> None:
     # Create a configuration with your preferred models
     config = AgentConfiguration(
         query_model="azure-openai/gpt-4o-mini",  
         response_model="azure-openai/gpt-4o-mini", 
-        thread_id=1,
+        # thread_id=1,
     )
     
     # Prepare input for the graph 
@@ -31,8 +28,11 @@ async def main(question: str) -> None:
     # langgraph library expects the config parameter to be a dictionary-like object, not an instance of a custom class like AgentConfiguration
 
     config_dict = asdict(config)
-    result = await graph.ainvoke(input_data, {"configurable": config_dict }, 
-                                #  debug = True,
+    result = await graph.ainvoke(input_data,
+                                config = {"recursion_limit": 10, # this is standalone config key 
+                                          "configurable": config_dict # this contains user defined config settings  
+                                          }, 
+                                # debug = True,
                                  )
 
     # Print the result

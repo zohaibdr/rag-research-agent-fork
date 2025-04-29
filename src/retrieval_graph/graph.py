@@ -15,18 +15,13 @@ from retrieval_graph.configuration import AgentConfiguration
 from retrieval_graph.researcher_graph.researcher_graph import researcher_graph
 from retrieval_graph.state import AgentState, InputState, Router
 from shared.utils import format_docs, load_chat_model
-# import os
-# from dotenv import load_dotenv, find_dotenv
-# load_dotenv(find_dotenv())
-# OPENAI_API_VERSION = os.environ["OPENAI_API_VERSION"]
 
 async def analyze_and_route_query(
     state: AgentState, *, config: RunnableConfig
 ) -> dict[str, Router]:
     """Analyze the user's query and determine the appropriate routing.
 
-    This function uses a language model to classify the user's query and decide how to route it
-    within the conversation flow.
+    This function uses a language model to classify the user's query and decide how to route it within the conversation flow.
 
     Args:
         state (AgentState): The current state of the agent, including conversation history.
@@ -69,7 +64,7 @@ def route_query(
         ValueError: If an unknown router type is encountered.
     """
     _type = state.router["type"]
-    if _type == "langchain":
+    if _type == "sec-filings":
         return "create_research_plan"
     elif _type == "more-info":
         return "ask_for_more_info"
@@ -90,11 +85,9 @@ async def ask_for_more_info(
     """Generate a response asking the user for more information.
 
     This node is called when the router determines that more information is needed from the user.
-
     Args:
         state (AgentState): The current state of the agent, including conversation history and router logic.
         config (RunnableConfig): Configuration with the model used to respond.
-
     Returns:
         dict[str, list[str]]: A dictionary with a 'messages' key containing the generated response.
     """
@@ -188,6 +181,7 @@ async def conduct_research(state: AgentState) -> dict[str, Any]:
     result = await researcher_graph.ainvoke({"question": state.steps[0]})
 
     print("Research Results:")
+    print(result.keys())
     for i, doc in enumerate(result["documents"], start=1):
         print(f"Document {i}: {doc.metadata}")
 
@@ -263,5 +257,5 @@ builder.add_edge("respond", END)                    # respond to user query and 
 from langgraph.checkpoint.memory import MemorySaver
 memory = MemorySaver() #to persist the context across interactions. short term memory
 
-graph = builder.compile(checkpointer=memory)           # checkpointer=memory
+graph = builder.compile(checkpointer=memory) 
 graph.name = "RetrievalGraph"

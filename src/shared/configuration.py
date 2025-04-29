@@ -39,9 +39,9 @@ class BaseConfiguration:
 
     search_kwargs: dict[str, Any] = field(
         default_factory=lambda: {
-            "k": 3,
-            "fetch_k": 5,
-            "score_threshold": 0.2
+            "k": 3,   #no. of docs to return. 
+            "fetch_k": 10,  #no of docs to fetch before filtering. default is 20. 
+            # "score_threshold": 0.2
         },
         metadata={
             "description": "Additional keyword arguments to pass to the search function of the retriever."

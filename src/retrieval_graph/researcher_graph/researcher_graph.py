@@ -88,8 +88,6 @@ def retrieve_in_parallel(state: ResearcherState) -> list[Send]:
     # Send – A message or packet to send to a specific node in the graph.
     # sending multiple inputs returns result for each.
 
-    print("RETRIEVING DOCUMENTS FOR QUERIES: \n", state.queries)
-
     return [
         Send("retrieve_documents", QueryState(query=query)) for query in state.queries
     ]
