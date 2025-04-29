@@ -9,7 +9,6 @@ license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "python-dotenv>=1.0.1",    
     "msgspec>=0.18.6",
 ]
 
@@ -55,7 +54,7 @@ lint.ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D", "UP"]
 [tool.ruff.lint.pydocstyle]
-convention = "google"
+convention = "restructuredtext"  # Changed from "google" to "restructuredtext"
 [tool.pytest.ini_options]
 pythonpath = [
   "src"
