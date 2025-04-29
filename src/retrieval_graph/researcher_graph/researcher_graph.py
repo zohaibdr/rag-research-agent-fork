@@ -42,6 +42,10 @@ async def generate_queries(
         {"role": "human", "content": state.question},
     ]
     response = cast(Response, await model.ainvoke(messages))
+
+    print("GENERATED QUERIES:::", response["queries"]) 
+    # apparently the step info is also passed to this fcn so the queries made are relevant to the research step in progress.
+
     return {"queries": response["queries"]}
 
 
@@ -60,7 +64,9 @@ async def retrieve_documents(
         dict[str, list[Document]]: A dictionary with a 'documents' key containing the list of retrieved documents.
     """
     with retrieval.make_retriever(config) as retriever:
+
         response = await retriever.ainvoke(state.query, config)
+        
         return {"documents": response}
 
 
@@ -79,6 +85,9 @@ def retrieve_in_parallel(state: ResearcherState) -> list[Send]:
         - Creates a Send object for each query in the state.
         - Each Send object targets the "retrieve_documents" node with the corresponding query.
     """
+    # Send – A message or packet to send to a specific node in the graph.
+    # sending multiple inputs returns result for each.
+
     return [
         Send("retrieve_documents", QueryState(query=query)) for query in state.queries
     ]
@@ -96,5 +105,5 @@ builder.add_conditional_edges(
 )
 builder.add_edge("retrieve_documents", END)
 # Compile into a graph object that you can invoke and deploy.
-graph = builder.compile()
-graph.name = "ResearcherGraph"
+researcher_graph = builder.compile()
+researcher_graph.name = "ResearcherGraph"
